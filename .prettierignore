@@ -1,0 +1,5 @@
+# Keep HTML fixtures byte-for-byte as captured (Bet A is verbatim, entity-encoded
+# `&quot;` from the live site — formatting would decode it and weaken the test).
+test/fixtures/
+# Generated snapshots are owned by vitest, not the formatter.
+**/__snapshots__/

@@ -1,0 +1,37 @@
+{
+  "name": "srg-fifa-betting-crawler",
+  "version": "1.0.0",
+  "description": "",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:update": "vitest run -u",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint",
+    "fmt": "oxfmt src test",
+    "fmt:check": "oxfmt --check src test",
+    "crawl": "node src/local/crawl.ts",
+    "build": "tsup && cp appsscript.json build/appsscript.json",
+    "push": "nub run build && clasp push",
+    "clean:cache": "rm -f cache/*.html"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@types/google-apps-script": "^2.0.11",
+    "@types/node": "^26.0.1",
+    "esbuild": "^0.28.1",
+    "oxfmt": "^0.56.0",
+    "oxlint": "^1.71.0",
+    "typescript": "^6.0.3",
+    "vitest": "^4.1.9"
+  },
+  "dependencies": {
+    "@google/clasp": "^3.3.0",
+    "@sinclair/typebox": "^0.34.49",
+    "node-html-parser": "^8.0.3",
+    "tsup": "^8.5.1"
+  },
+  "allowBuilds": {
+    "esbuild": true
+  }
+}
