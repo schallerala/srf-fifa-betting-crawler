@@ -49,6 +49,7 @@ async function main(): Promise<void> {
     }
 
     const curve = buildCumulative(confrontations);
+    console.log(`flushing ${curve.length} point(s) for ${participant.name}`);
     console.log(`\n=== ${participant.name} (${participant.id}) ===`);
     for (const point of curve) {
       console.log(
@@ -58,6 +59,7 @@ async function main(): Promise<void> {
       );
     }
   }
+  console.log("\nDone.");
 }
 
 main().catch((err) => {

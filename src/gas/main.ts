@@ -33,6 +33,7 @@ const HtmlSchema = Type.String({ minLength: 1 });
 /** Fetch one betting page via the GAS URL fetch service. */
 function fetchBetPage(participantId: string, roundId: number): string {
   const url = buildBetUrl(participantId, roundId);
+  Logger.log(`Request: GET ${url}`);
   const response = UrlFetchApp.fetch(url, { muteHttpExceptions: true });
   const code = response.getResponseCode();
   if (code !== 200) {
@@ -115,14 +116,30 @@ function updateParticipant(
   const state = readValue(ParticipantStateSchema, key);
   const startRound = state?.resumeRound ?? ROUNDS[0]!.id;
 
+  if (state) {
+    Logger.log(
+      `[${participant.name}] cache hit — resuming from round ${startRound} ` +
+        `(last written ${state.lastWrittenEventDate ?? "none"})`,
+    );
+  } else {
+    Logger.log(`[${participant.name}] cache miss — starting fresh from round ${startRound}`);
+  }
+
   const fetched = fetchUntilIncomplete(participant.id, startRound);
-  if (fetched.length === 0) return;
+  if (fetched.length === 0) {
+    Logger.log(`[${participant.name}] nothing to fetch — up to date`);
+    return;
+  }
 
   const sheet = getOrCreateSheet(spreadsheet, participant.name);
   ensureHeader(sheet);
 
   const plan = planSheetAppend(fetched, state?.lastWrittenEventDate ?? null, lastCumulative(sheet));
   appendRows(sheet, plan.rows);
+  Logger.log(
+    `[${participant.name}] flushed ${plan.rows.length} row(s) to sheet; ` +
+      `resume round now ${plan.resumeRound}`,
+  );
 
   writeValue(ParticipantStateSchema, key, {
     lastWrittenEventDate: plan.lastWrittenEventDate,
@@ -136,9 +153,11 @@ function updateParticipant(
  */
 function updateAllParticipants(): void {
   const spreadsheet = SpreadsheetApp.getActiveSpreadsheet();
+  Logger.log(`Starting update for ${PARTICIPANTS.length} participant(s)`);
   for (const participant of PARTICIPANTS) {
     updateParticipant(spreadsheet, participant);
   }
+  Logger.log("Done — all participants updated");
 }
 
 /** Adds a custom menu so the crawl can be triggered from the Sheets UI. */

@@ -41,10 +41,12 @@ export async function fetchBetPage(
   const path = cachePath(participantId, roundId);
 
   if (useCache && existsSync(path)) {
+    console.log(`cache hit: ${path}`);
     return parseOrThrow(HtmlSchema, readFileSync(path, "utf8"), `cache ${path}`);
   }
 
   const url = buildBetUrl(participantId, roundId);
+  console.log(useCache ? `cache miss: requesting ${url}` : `request: ${url}`);
   const res = await fetch(url);
   if (!res.ok) {
     throw new Error(`Fetch failed for ${url}: HTTP ${res.status}`);
